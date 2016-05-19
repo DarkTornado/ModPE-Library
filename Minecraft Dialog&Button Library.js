@@ -228,3 +228,15 @@ function MinecraftButton(ctx) {
     return btn;
 }
 
+
+function selectLevelHook() {
+    var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
+    var so = org.mozilla.javascript.ScriptableObject;
+    for(var n = 0; n < script.size(); n++) {
+        var scope = script.get(n).scope;
+        if(!so.hasProperty(scope, "MinecraftDialog"))
+            so.putProperty(scope, "MinecraftDialog", MinecraftDialog);
+        if(!so.hasProperty(scope, "MinecraftButton"))
+            so.putProperty(scope, "MinecraftButton", MinecraftButton);
+    }
+}
