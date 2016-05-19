@@ -1,4 +1,4 @@
-﻿/*
+/*
 Minecraft Dialog&Button Library
 © 2015-2016 Dark Tornado, All rights reserved.
 version 1.0
@@ -19,12 +19,20 @@ But, cannnot use android.view.View.OnTouchListener;
 
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
+var white = android.graphics.Color.WHITE;
+
 var guiFile = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/spritesheet.png"));
 var btnBack1 = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guiFile, 8, 32, 8, 8), dip2px(ctx, 8), dip2px(ctx, 8), false);
 var btnBack2 = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guiFile, 0, 32, 8, 8), dip2px(ctx, 8), dip2px(ctx, 8), false);
 var matrix = new android.graphics.Matrix();
 matrix.postScale(-1, -1);
 var btnBack3 = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guiFile, 0, 32, 8, 8, matrix, false), dip2px(ctx, 8), dip2px(ctx, 8), false);
+
+
+function dip2px(ctx, dips) {
+    return Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
+}
+
 
 
 function btnBack(type) {
