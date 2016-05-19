@@ -1,7 +1,7 @@
 /*
 Minecraft Dialog&Button Library
 © 2015-2016 Dark Tornado, All rights reserved.
-version 1.0
+version 1.1
 
 var dialog = new MinecraftDialog();
 .setTitle(String title);
@@ -32,7 +32,6 @@ var btnBack3 = new android.graphics.Bitmap.createScaledBitmap(android.graphics.B
 function dip2px(ctx, dips) {
     return Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
 }
-
 
 
 function btnBack(type) {
