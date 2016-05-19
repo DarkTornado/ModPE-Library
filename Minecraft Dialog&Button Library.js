@@ -1,7 +1,7 @@
 ﻿/*
 Minecraft Dialog&Button Library
 © 2015-2016 Dark Tornado, All rights reserved.
-version 1.0 beta
+version 1.0
 
 var dialog = new MinecraftDialog();
 .setTitle(String title);
@@ -240,3 +240,4 @@ function selectLevelHook() {
             so.putProperty(scope, "MinecraftButton", MinecraftButton);
     }
 }
+
