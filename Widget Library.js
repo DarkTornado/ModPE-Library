@@ -443,16 +443,3 @@ Menu.prototype = {
 
 };
 
-
-function selectLevelHook() {
-    var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
-    var so = org.mozilla.javascript.ScriptableObject;
-    for(var n = 0; n < script.size(); n++) {
-        var scope = script.get(n).scope;
-        if(!so.hasProperty(scope, "Widget"))
-            so.putProperty(scope, "Widget", Widget);
-        if(!so.hasProperty(scope, "Menu"))
-            so.putProperty(scope, "Menu", Menu);
-    }
-}
-
