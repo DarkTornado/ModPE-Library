@@ -1,7 +1,7 @@
 ﻿/*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.0
+version 1.1
 
 void File.makeFolder(String path); //Make Folder
 void File.create(String path); //Create File
@@ -190,14 +190,4 @@ const File = {
 
 };
 
-
-function selectLevelHook() {
-    var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
-    var so = org.mozilla.javascript.ScriptableObject;
-    for(var n = 0; n < script.size(); n++) {
-        var scope = script.get(n).scope;
-        if(!so.hasProperty(scope, "File"))
-            so.putProperty(scope, "File", File);
-    }
-}
 
