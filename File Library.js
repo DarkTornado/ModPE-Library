@@ -1,30 +1,29 @@
 ﻿/*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.1
+version 1.2
 
-void File.makeFolder(String path); //Make Folder
+void File.copy(String path1, String path2); //Copy File from path1 to path2
 void File.create(String path); //Create File
-void File.write(String path, String value); //Write File
+void File.download(String path, String file, String url); //Download File
+Boolean File.exists(String path); //Check File
+File[] File.getListByFile(String path); //Get File List
+Boolean File.isFile(String path); //Check if the file is File
+Boolean File.isFolder(String path); //Check if the file is Folder
+void File.makeFolder(String path); //Make Folder
+void File.move(String path1, String path2); //Move File from path1 to path2
 String File.read(String path); //Read File
 void File.remove(String path); //Remove File
-void File.move(String path1, String path2); //Move File from path1 to path2
-String[] File.getList(String path); //Get File List
 void File.removeFolder(String path); //Remove Folder
 void File.unZip(String path1, String path2, Boolean makeFolder); //Unzip File(path1) to path 2
-void File.download(String path, String file, String url); //Download File
-void File.copy(String path1, String path2); //Move File from path1 to path2
-Boolean File.isFolder(String path); //Check if the file is Folder
-Boolean File.isFile(String path); //Check if the file is File
-Boolean File.exists(String path); //Check File
+void File.write(String path, String value); //Write File
 */
-
 
 const File = {
     makeFolder: function(path) {
         try {
             var folder = new java.io.File(path);
-            folder.mkdir();
+            folder.mkdirs();
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -112,7 +111,7 @@ const File = {
             print(e + ", " + e.lineNumber);
         }
     },
-	unZip: function(path1, path2, tf) {
+    unZip: function(path1, path2, tf) {
         try {
             if(tf) {
                 var folder = new java.io.File(path);
@@ -120,7 +119,7 @@ const File = {
                 var pp = path2.toString().split("/");
                 path2 = path2 + pp[pp.length - 1].substring(0, lastIndexOf("."));
             }
-			var fis = new java.io.FileInputStream(path1);
+            var fis = new java.io.FileInputStream(path1);
             var zis = new java.util.zip.ZipInputStream(fis);
             var entry;
             while((entry = zis.getNextEntry()) != null) {
@@ -131,7 +130,7 @@ const File = {
                 zis.closeEntry();
                 fos.close();
             }
-        zis.close();
+            zis.close();
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -142,8 +141,8 @@ const File = {
                 try {
                     var uri = new android.net.Uri.parse(url);
                     var dm = new android.app.DownloadManager.Request(uri);
-                    dm.setTitle("파일 다운로드");
-                    dm.setDescription("파일 다운로드 중...");
+                    dm.setTitle("File Download");
+                    dm.setDescription("Downloading...");
                     dm.setDestinationInExternalPublicDir(path, file);
                     dm.setNotificationVisibility(1);
                     ctx.getSystemService(android.content.Context.DOWNLOAD_SERVICE).enqueue(dm);
@@ -154,40 +153,50 @@ const File = {
         }));
     },
     copy: function(path1, path2) {
-        try{
-            File.wrtie(path2, File.read(path2));
+        try {
+            var file1 = new java.io.File(path1);
+            var file2 = new java.io.File(path2);
+            var fis = new java.io.FileInputStream(file1);
+            var fos = new java.io.FileOutputStream(file2);
+            var bis = new java.io.BufferedInputStream(fis);
+            var bos = new java.io.BufferedOutputStream(fos);
+            var buf;
+            while((buf = bis.read()) != -1) {
+                bos.write(buf);
+            }
+            bis.close();
+            bos.close();
+            fis.close();
+            fos.close();
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
     },
-	isFolder : function(path) {
-        try{
+    isFolder: function(path) {
+        try {
             var file = new java.io.File(path);
-			if(file.isDirectory()) return true;
-			else return false;
+            if(file.isDirectory()) return true;
+            else return false;
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
     },
-	isFile : function(path) {
-        try{
+    isFile: function(path) {
+        try {
             var file = new java.io.File(path);
-			if(file.isFile()) return true;
-			else return false;
+            if(file.isFile()) return true;
+            else return false;
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
     },
-	exists : function(path) {
-        try{
+    exists: function(path) {
+        try {
             var file = new java.io.File(path);
-			return file.exists();
+            return file.exists();
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
-	}
-
-
+    }
 };
-
 
