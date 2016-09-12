@@ -18,9 +18,9 @@ But, cannnot use android.view.View.OnTouchListener;
 */
 
 
+try{
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
-
-var white = android.graphics.Color.WHITE;
+}catch(e){}
 
 var guiFile = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/spritesheet.png"));
 var btnBack1 = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guiFile, 8, 32, 8, 8), dip2px(ctx, 8), dip2px(ctx, 8), false);
@@ -123,7 +123,7 @@ MinecraftDialog.prototype = {
             title.setPadding(pad, pad, pad, pad);
             var text = new android.widget.TextView(ctx);
             text.setText(this.msg);
-            text.setTextColor(white);
+            text.setTextColor(android.graphics.Color.WHITE);
             text.setTextSize(20);
             layout.addView(text);
             var btnLayout = new android.widget.LinearLayout(ctx);
@@ -132,7 +132,7 @@ MinecraftDialog.prototype = {
                 var btnN = new android.widget.Button(ctx);
                 var funcN = this.nFunc;
                 btnN.setText(this.nStr);
-                btnN.setTextColor(white);
+                btnN.setTextColor(android.graphics.Color.WHITE);
                 btnN.setBackgroundDrawable(btnBack(1));
                 if (this.pBtn) btnN.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth() * 1 / 3 - dip2px(ctx, 15));
                 else btnN.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth() * 2 / 3 - dip2px(ctx, 30));
@@ -162,7 +162,7 @@ MinecraftDialog.prototype = {
                 var btnP = new android.widget.Button(ctx);
                 var funcP = this.pFunc;
                 btnP.setText(this.pStr);
-                btnP.setTextColor(white);
+                btnP.setTextColor(android.graphics.Color.WHITE);
                 btnP.setBackgroundDrawable(btnBack(1));
                 if (this.nBtn) btnP.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth() * 2 / 3 - dip2px(ctx, 15));
                 else btnP.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth() * 1 / 3 - dip2px(ctx, 30));
@@ -222,7 +222,7 @@ MinecraftDialog.prototype = {
 function MinecraftButton(ctx) {
     var btn = new android.widget.Button(ctx);
     btn.setBackgroundDrawable(btnBack(1));
-    btn.setTextColor(white);
+    btn.setTextColor(android.graphics.Color.WHITE);
     btn.setOnTouchListener(new android.view.View.OnTouchListener({
         onTouch: function(v, ev) {
             if (ev.action == android.view.MotionEvent.ACTION_DOWN) {
