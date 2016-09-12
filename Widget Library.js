@@ -1,8 +1,8 @@
 /*
 Menu Library
-version 1.0
+version 1.1
 © 2016 Dark Tornado, All rights reserved.
-
+-----
 Widget
 
 Widget.Color(Same as android.graphics.Color)
@@ -75,7 +75,7 @@ var menu = new Menu();
 .getWidgetText(int index);  //Get Widget's Text from menu.
 .show(int pos1, int pos2);  //Show the menu.
 .close();  //Close the menu.
-
+-----
 
 */
 
