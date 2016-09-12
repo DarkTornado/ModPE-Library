@@ -1,22 +1,23 @@
 ﻿/*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.2
-
-void File.copy(String path1, String path2); //Copy File from path1 to path2
-void File.create(String path); //Create File
-void File.download(String path, String file, String url); //Download File
-Boolean File.exists(String path); //Check File
-File[] File.getListByFile(String path); //Get File List
-Boolean File.isFile(String path); //Check if the file is File
-Boolean File.isFolder(String path); //Check if the file is Folder
-void File.makeFolder(String path); //Make Folder
-void File.move(String path1, String path2); //Move File from path1 to path2
-String File.read(String path); //Read File
-void File.remove(String path); //Remove File
-void File.removeFolder(String path); //Remove Folder
-void File.unZip(String path1, String path2, Boolean makeFolder); //Unzip File(path1) to path 2
-void File.write(String path, String value); //Write File
+version 1.3
+-----
+void File.copy(String path1, String path2); 
+void File.create(String path); 
+void File.download(String path, String file, String url); 
+Boolean File.exists(String path); 
+File[] File.getListByFile(String path); 
+Boolean File.isFile(String path); 
+Boolean File.isFolder(String path); 
+void File.makeFolder(String path); 
+void File.move(String path1, String path2); 
+String File.read(String path); 
+void File.remove(String path); 
+void File.removeFolder(String path); 
+void File.unZip(String path1, String path2, Boolean makeFolder); 
+void File.write(String path, String value); 
+-----
 */
 
 const File = {
