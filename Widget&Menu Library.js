@@ -1,5 +1,5 @@
 /*
-Menu Library
+Widget&Menu Library
 version 1.1
 © 2016 Dark Tornado, All rights reserved.
 -----
@@ -55,7 +55,7 @@ void Widget.toast(String message);  //Show Toast
 
 Menu
 
-var menu = new Menu();
+new Menu();
 .setTitle(String title);  //Set Menu's Title.
 .setTitleColor(Color color);  //Set Menu's Title's Color.
 .setTitleSize(int size);  //Set Menu's Title's Size. Defalut value is 20.
@@ -79,17 +79,16 @@ var menu = new Menu();
 
 */
 
-
+try{
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
+}catch(e){}
 
 var windowArray = [];
 var menuArray = [];
 
-
 function dip2px(ctx, dips) {
     return Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
 }
-
 
 const Widget = {
     Color: android.graphics.Color,
@@ -270,8 +269,6 @@ const Widget = {
             }
         }));
     }
-
-
 };
 
 
@@ -439,7 +436,5 @@ Menu.prototype = {
             }
         }));
     }
-
-
 };
 
