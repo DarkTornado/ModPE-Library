@@ -1,9 +1,9 @@
 /*
 Minecraft Dialog&Button Library
 © 2015-2016 Dark Tornado, All rights reserved.
-version 1.2
-
-var dialog = new MinecraftDialog();
+version 1.3
+-----
+new MinecraftDialog();
 .setTitle(String title);
 .setMessage(String msg);
 .setPositiveButton(String value, void func);
@@ -14,6 +14,7 @@ var dialog = new MinecraftDialog();
 
 MinecraftButton is same as android.widget.Button;
 But, cannnot use android.view.View.OnTouchListener;
+-----
 */
 
 
