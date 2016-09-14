@@ -87,6 +87,12 @@ print(e);
 }));
 this.layout.addView(txt);
 },
+setColor:function(color){
+this.color = color;
+},
+setDrawable:function(drawable){
+this.drawable = drawable;
+},
 show: function() {
 var cache = this;
 var ctx = this.ctx;
