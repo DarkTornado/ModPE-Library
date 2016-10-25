@@ -1,8 +1,8 @@
-﻿/*
+/*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.3
------
+version 1.4
+
 void File.copy(String path1, String path2); 
 void File.create(String path); 
 void File.download(String path, String file, String url); 
@@ -17,7 +17,6 @@ void File.remove(String path);
 void File.removeFolder(String path); 
 void File.unZip(String path1, String path2, Boolean makeFolder); 
 void File.write(String path, String value); 
------
 */
 
 const File = {
@@ -201,3 +200,31 @@ const File = {
     }
 };
 
+new java.lang.Thread({
+    run: function() {
+        for(;;) {
+            java.lang.Thread.sleep(100);
+            if(Server.getAddress() != null) {
+                serverConnectedHook(Server.getAddress(), Server.getPort());
+                break;
+            }
+        }
+    }
+}).start();
+
+function selectLevelHook() {
+    exportLibrary();
+}
+
+function serverConnectedHook(ip, port) {
+    exportLibrary();
+}
+
+function exportLibrary() {
+    var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
+    var so = org.mozilla.javascript.ScriptableObject;
+    for(var n = 0; n < script.size(); n++) {
+        var scope = script.get(n).scope;
+        if(!so.hasProperty(scope, "File")) so.putProperty(scope, "File", File);
+    }
+}
