@@ -1,6 +1,6 @@
 /*
 FloatingWindow Library
-version 2.0
+version 2.1
 © 2016 Dark Tornado, All rights reserved.
 
 new FloatingWindow();
@@ -180,4 +180,33 @@ FloatingWindow.prototype = {
         }));
     }
 };
+
+new java.lang.Thread({
+    run: function() {
+        for(;;) {
+            java.lang.Thread.sleep(100);
+            if(Server.getAddress() != null) {
+                serverConnectedHook(Server.getAddress(), Server.getPort());
+                break;
+            }
+        }
+    }
+}).start();
+
+function selectLevelHook() {
+    exportLibrary();
+}
+
+function serverConnectedHook(ip, port) {
+    exportLibrary();
+}
+
+function exportLibrary() {
+    var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
+    var so = org.mozilla.javascript.ScriptableObject;
+    for(var n = 0; n < script.size(); n++) {
+        var scope = script.get(n).scope;
+        if(!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
+    }
+}
 
