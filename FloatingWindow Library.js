@@ -1,19 +1,18 @@
 /*
 FloatingWindow Library
-version 2.2
+version 2.3
 © 2016 Dark Tornado, All rights reserved.
 
 new FloatingWindow();
 .setTitle(String title);
 .setTitleColor(Color color);
 .addText(String text, void func);
-.addText(String text, String func);
 .addToggleText(String text, void func1, void func2, boolean isChecked);
-.addToggleText(String text, void func1, String func2, boolean isChecked);
-.addToggleText(String text, String func1, void func2, boolean isChecked);
-.addToggleText(String text, String func1, String func2, boolean isChecked);
+.addExitText(String text);
 .setColor(int Color);
 .setDrawable(Drawable drawable);
+.setWidth(int sizeX);
+.setHeight(int sizeY);
 .show();
 .close();
 */
@@ -34,8 +33,8 @@ const Runnable = java.lang.Runnable;
 const ScriptManager = net.zhuoweizhang.mcpelauncher.ScriptManager;
 const ScriptableObject = org.mozilla.javascript.ScriptableObject;
 
-function dip2px(ctx, dips){
-return Math.ceil(dips*ctx.getResources().getDisplayMetrics().density);
+function dip2px(ctx, dips) {
+    return Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
 }
 
 function FloatingWindow() {
@@ -45,9 +44,9 @@ function FloatingWindow() {
     this.color = Color.argb(110, 100, 255, 100);
     this.drawable = null;
     this.layout = new LinearLayout(ctx);
-    this.dp = function(dips) {
-        return Math.ceil(dips * ctx.getResources().getDisplayMetrics().density);
-    };
+    this.txtArr = [];
+    this.cb = null;
+    this.size = [dip2px(ctx, 100), dip2px(ctx, 130)];
 }
 
 FloatingWindow.prototype = {
@@ -63,52 +62,54 @@ FloatingWindow.prototype = {
         txt.setTextColor(Color.WHITE);
         txt.setTextSize(15);
         txt.setGravity(Gravity.CENTER);
-        if(func != null) txt.setOnClickListener(new View.OnClickListener({
+        if (func != null) txt.setOnClickListener(new View.OnClickListener({
             onClick: function(v) {
                 try {
-                    if(typeof func == "function") func();
-                    else eval(func + "");
-                } catch(e) {
+                    func();
+                } catch (e) {
                     print(e);
                 }
             }
         }));
         this.layout.addView(txt);
+        this.txtArr.push(txt);
     },
     addToggleText: function(text, func1, func2, tf) {
         var txt = new TextView(ctx);
         txt.setText(text);
-        if(tf) txt.setTextColor(Color.YELLOW);
+        if (tf) txt.setTextColor(Color.YELLOW);
         else txt.setTextColor(Color.WHITE);
         txt.setTextSize(15);
         txt.setGravity(Gravity.CENTER);
         txt.setOnClickListener(new View.OnClickListener({
             onClick: function(v) {
                 try {
-                    switch(txt.getTextColors().getDefaultColor()) {
+                    switch (txt.getTextColors().getDefaultColor()) {
                         case Color.WHITE:
-                            if(typeof func1 == "function") func1();
-                            else eval(func1 + "");
+                            func1();
                             txt.setTextColor(Color.YELLOW);
                             break;
                         case Color.YELLOW:
-                            if(typeof func2 == "function") func2();
-                            else eval(func2 + "");
+                            func2();
                             txt.setTextColor(Color.WHITE);
                             break;
                     }
-                } catch(e) {
+                } catch (e) {
                     print(e);
                 }
             }
         }));
         this.layout.addView(txt);
+        this.txtArr.push(txt);
     },
     setColor: function(color) {
         this.color = color;
     },
     setDrawable: function(drawable) {
         this.drawable = drawable;
+    },
+    getText: function(index) {
+        return this.txtArr[index];
     },
     show: function() {
         var cache = this;
@@ -135,14 +136,14 @@ FloatingWindow.prototype = {
                     title.setOnClickListener(new View.OnClickListener({
                         onClick: function(v) {
                             try {
-                                if(layout.getChildCount() == 1) {
+                                if (layout.getChildCount() == 1) {
                                     layout.addView(scroll);
-                                    cache.window.update(dip2px(ctx, 100), dip2px(ctx, 130));
+                                    cache.window.update(cache.size[0], cache.size[1]);
                                 } else {
                                     layout.removeView(scroll);
-                                    cache.window.update(dip2px(ctx, 100), dip2px(ctx, 30));
+                                    cache.window.update(cache.size[0], -2);
                                 }
-                            } catch(e) {
+                            } catch (e) {
                                 print(e);
                             }
                         }
@@ -157,8 +158,8 @@ FloatingWindow.prototype = {
                     title.setOnTouchListener(new View.OnTouchListener({
                         onTouch: function(v, ev) {
                             try {
-                                if(longTouchCheck) {
-                                    switch(ev.action) {
+                                if (longTouchCheck) {
+                                    switch (ev.action) {
                                         case MotionEvent.ACTION_MOVE:
                                             cache.window.update(ev.getRawX(), ev.getRawY(), cache.window.getWidth(), cache.window.getHeight());
                                             break;
@@ -168,18 +169,18 @@ FloatingWindow.prototype = {
                                     }
                                 }
                                 return false;
-                            } catch(e) {
+                            } catch (e) {
                                 print(e);
                             }
                         }
                     }));
                     cache.window.setContentView(layout);
-                    cache.window.setWidth(dip2px(ctx, 100));
-                    cache.window.setHeight(dip2px(ctx, 130));
-                    if(cache.drawable != null) cache.window.setBackgroundDrawable(cache.drawable);
+                    cache.window.setWidth(cache.size[0]);
+                    cache.window.setHeight(cache.size[1]);
+                    if (cache.drawable != null) cache.window.setBackgroundDrawable(cache.drawable);
                     else cache.window.setBackgroundDrawable(new ColorDrawable(cache.color));
                     cache.window.showAtLocation(ctx.getWindow().getDecorView(), Gravity.LEFT | Gravity.TOP, dip2px(ctx, 90), dip2px(ctx, 90));
-                } catch(e) {
+                } catch (e) {
                     print(e);
                 }
             }
@@ -190,20 +191,44 @@ FloatingWindow.prototype = {
         ctx.runOnUiThread(new java.lang.Runnable({
             run: function() {
                 try {
-                    if(window != null) window.dismiss();
-                } catch(e) {
+                    if (window != null) window.dismiss();
+                } catch (e) {
                     print(e);
                 }
             }
         }));
+    },
+    addExitText: function(txt) {
+        if (txt == null) txt = "닫기";
+        this.cb = new TextView(ctx);
+        this.cb.setText(txt);
+        this.cb.setTextColor(Color.WHITE);
+        this.cb.setTextSize(15);
+        this.cb.setGravity(Gravity.CENTER);
+        this.cb.setOnClickListener(new View.OnClickListener({
+            onClick: function(v) {
+                try {
+                    this.window.dismiss();
+                } catch (e) {
+                    print(e);
+                }
+            }
+        }));
+        this.layout.addView(this.cb);
+    },
+    setWidth: function(value) {
+        this.size[0] = value;
+    },
+    setHeight: function(value) {
+        this.size[1] = value;
     }
 };
 
 new Thread({
     run: function() {
-        for(;;) {
+        for (;;) {
             Thread.sleep(100);
-            if(Server.getAddress() != null) {
+            if (Server.getAddress() != null) {
                 serverConnectedHook(Server.getAddress(), Server.getPort());
                 break;
             }
@@ -222,10 +247,9 @@ function serverConnectedHook(ip, port) {
 function exportLibrary() {
     var script = ScriptManager.scripts;
     var so = ScriptableObject;
-    for(var n = 0; n < script.size(); n++) {
+    for (var n = 0; n < script.size(); n++) {
         var scope = script.get(n).scope;
-        if(!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
+        if (!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
     }
 }
-
 
