@@ -13,9 +13,11 @@ new FloatingWindow();
 .setDrawable(Drawable drawable);
 .setWidth(int sizeX);
 .setHeight(int sizeY);
+.getText(int index);
 .show();
 .close();
 */
+
 
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 
@@ -62,11 +64,11 @@ FloatingWindow.prototype = {
         txt.setTextColor(Color.WHITE);
         txt.setTextSize(15);
         txt.setGravity(Gravity.CENTER);
-        if (func != null) txt.setOnClickListener(new View.OnClickListener({
+        if(func != null) txt.setOnClickListener(new View.OnClickListener({
             onClick: function(v) {
                 try {
                     func();
-                } catch (e) {
+                } catch(e) {
                     print(e);
                 }
             }
@@ -77,14 +79,14 @@ FloatingWindow.prototype = {
     addToggleText: function(text, func1, func2, tf) {
         var txt = new TextView(ctx);
         txt.setText(text);
-        if (tf) txt.setTextColor(Color.YELLOW);
+        if(tf) txt.setTextColor(Color.YELLOW);
         else txt.setTextColor(Color.WHITE);
         txt.setTextSize(15);
         txt.setGravity(Gravity.CENTER);
         txt.setOnClickListener(new View.OnClickListener({
             onClick: function(v) {
                 try {
-                    switch (txt.getTextColors().getDefaultColor()) {
+                    switch(txt.getTextColors().getDefaultColor()) {
                         case Color.WHITE:
                             func1();
                             txt.setTextColor(Color.YELLOW);
@@ -94,7 +96,7 @@ FloatingWindow.prototype = {
                             txt.setTextColor(Color.WHITE);
                             break;
                     }
-                } catch (e) {
+                } catch(e) {
                     print(e);
                 }
             }
@@ -109,7 +111,8 @@ FloatingWindow.prototype = {
         this.drawable = drawable;
     },
     getText: function(index) {
-        return this.txtArr[index];
+        if(index == -1) return this.cb;
+        else return this.txtArr[index];
     },
     show: function() {
         var cache = this;
@@ -136,14 +139,14 @@ FloatingWindow.prototype = {
                     title.setOnClickListener(new View.OnClickListener({
                         onClick: function(v) {
                             try {
-                                if (layout.getChildCount() == 1) {
+                                if(layout.getChildCount() == 1) {
                                     layout.addView(scroll);
                                     cache.window.update(cache.size[0], cache.size[1]);
                                 } else {
                                     layout.removeView(scroll);
                                     cache.window.update(cache.size[0], -2);
                                 }
-                            } catch (e) {
+                            } catch(e) {
                                 print(e);
                             }
                         }
@@ -158,8 +161,8 @@ FloatingWindow.prototype = {
                     title.setOnTouchListener(new View.OnTouchListener({
                         onTouch: function(v, ev) {
                             try {
-                                if (longTouchCheck) {
-                                    switch (ev.action) {
+                                if(longTouchCheck) {
+                                    switch(ev.action) {
                                         case MotionEvent.ACTION_MOVE:
                                             cache.window.update(ev.getRawX(), ev.getRawY(), cache.window.getWidth(), cache.window.getHeight());
                                             break;
@@ -169,7 +172,7 @@ FloatingWindow.prototype = {
                                     }
                                 }
                                 return false;
-                            } catch (e) {
+                            } catch(e) {
                                 print(e);
                             }
                         }
@@ -177,10 +180,10 @@ FloatingWindow.prototype = {
                     cache.window.setContentView(layout);
                     cache.window.setWidth(cache.size[0]);
                     cache.window.setHeight(cache.size[1]);
-                    if (cache.drawable != null) cache.window.setBackgroundDrawable(cache.drawable);
+                    if(cache.drawable != null) cache.window.setBackgroundDrawable(cache.drawable);
                     else cache.window.setBackgroundDrawable(new ColorDrawable(cache.color));
                     cache.window.showAtLocation(ctx.getWindow().getDecorView(), Gravity.LEFT | Gravity.TOP, dip2px(ctx, 90), dip2px(ctx, 90));
-                } catch (e) {
+                } catch(e) {
                     print(e);
                 }
             }
@@ -191,25 +194,26 @@ FloatingWindow.prototype = {
         ctx.runOnUiThread(new java.lang.Runnable({
             run: function() {
                 try {
-                    if (window != null) window.dismiss();
-                } catch (e) {
+                    if(window != null) window.dismiss();
+                } catch(e) {
                     print(e);
                 }
             }
         }));
     },
     addExitText: function(txt) {
-        if (txt == null) txt = "닫기";
+        if(txt == null) txt = "닫기";
         this.cb = new TextView(ctx);
         this.cb.setText(txt);
         this.cb.setTextColor(Color.WHITE);
         this.cb.setTextSize(15);
         this.cb.setGravity(Gravity.CENTER);
+        var window = this.window;
         this.cb.setOnClickListener(new View.OnClickListener({
             onClick: function(v) {
                 try {
-                    this.window.dismiss();
-                } catch (e) {
+                    window.dismiss();
+                } catch(e) {
                     print(e);
                 }
             }
@@ -226,9 +230,9 @@ FloatingWindow.prototype = {
 
 new Thread({
     run: function() {
-        for (;;) {
+        for(;;) {
             Thread.sleep(100);
-            if (Server.getAddress() != null) {
+            if(Server.getAddress() != null) {
                 serverConnectedHook(Server.getAddress(), Server.getPort());
                 break;
             }
@@ -247,9 +251,9 @@ function serverConnectedHook(ip, port) {
 function exportLibrary() {
     var script = ScriptManager.scripts;
     var so = ScriptableObject;
-    for (var n = 0; n < script.size(); n++) {
+    for(var n = 0; n < script.size(); n++) {
         var scope = script.get(n).scope;
-        if (!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
+        if(!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
     }
 }
 
