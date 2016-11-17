@@ -52,7 +52,7 @@ function useItem(x, y, z, i, b, s, it, bd) {
 
 function leaveGame() {
     if(win != null) {
-        win.dismiss();
+        win.close();
         win = null;
     }
 }
