@@ -1,26 +1,27 @@
 /*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.4
+version 1.5
 
-void File.copy(String path1, String path2); 
-void File.create(String path); 
-void File.download(String path, String file, String url); 
-Boolean File.exists(String path); 
-File[] File.getListByFile(String path); 
-Boolean File.isFile(String path); 
-Boolean File.isFolder(String path); 
-void File.makeFolder(String path); 
-void File.move(String path1, String path2); 
-String File.read(String path); 
-void File.remove(String path); 
-void File.removeFolder(String path); 
-void File.unZip(String path1, String path2, Boolean makeFolder); 
-void File.write(String path, String value); 
+void File.copy(String path1, String path2);
+void File.copyFolder(String path1, String path2);
+void File.createFile(String path);
+void File.createFolder(String path);
+void File.download(String path, String file, String url);
+Boolean File.exists(String path);
+File[] File.getList(String path);
+Boolean File.isFile(String path);
+Boolean File.isFolder(String path);
+void File.move(String path1, String path2);
+String File.read(String path);
+void File.remove(String path);
+void File.removeFolder(String path);
+void File.unZip(String path1, String path2, Boolean makeFolder);
+void File.write(String path, String value);
 */
 
 const File = {
-    makeFolder: function(path) {
+    createFolder: function(path) {
         try {
             var folder = new java.io.File(path);
             folder.mkdirs();
@@ -28,7 +29,7 @@ const File = {
             print(e + ", " + e.lineNumber);
         }
     },
-    create: function(path) {
+    createFile: function(path) {
         try {
             var file = new java.io.File(path);
             file.createNewFile();
@@ -197,6 +198,26 @@ const File = {
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
+    },
+    copyFolder: function(path1, path2) {
+        try {
+            var file1 = new java.io.File(path1);
+            var file2 = new java.io.File(path2);
+            if(file1.isDirectory()) {
+                var file3 = new java.io.File(path2, file1.getName());
+                file3.mkdirs();
+                var child = file1.list();
+                for(var n = 0; n < child.length; n++) {
+                    var file4 = new java.io.File(file1, child[n]);
+                    if(file4.isDirectory()) File.copyFolder(file4, file3);
+                    else File.copy(file4, new java.io.File(file3, child[n]));
+                }
+            } else {
+                File.copy(path1, path2);
+            }
+        } catch(e) {
+            print(e + ", " + e.lineNumber);
+        }
     }
 };
 
@@ -205,7 +226,7 @@ new java.lang.Thread({
         for(;;) {
             java.lang.Thread.sleep(100);
             if(Server.getAddress() != null) {
-                serverConnectedHook(Server.getAddress(), Server.getPort());
+                selectLevelHook();
                 break;
             }
         }
@@ -213,14 +234,6 @@ new java.lang.Thread({
 }).start();
 
 function selectLevelHook() {
-    exportLibrary();
-}
-
-function serverConnectedHook(ip, port) {
-    exportLibrary();
-}
-
-function exportLibrary() {
     var script = net.zhuoweizhang.mcpelauncher.ScriptManager.scripts;
     var so = org.mozilla.javascript.ScriptableObject;
     for(var n = 0; n < script.size(); n++) {
