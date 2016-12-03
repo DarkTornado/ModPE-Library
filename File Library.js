@@ -1,10 +1,11 @@
 /*
 File Library
 © 2016 Dark Tornado, All rights reserved.
-version 1.5
+version 2.0
 
-void File.copy(String path1, String path2);
-void File.copyFolder(String path1, String path2);
+void File.copy(String path1, String path2, boolean useNioPackage);
+void File.copyFolder(String path1, String path2, boolean useNioPackage);
+void File.copyFromWeb(String url, String path);
 void File.createFile(String path);
 void File.createFolder(String path);
 void File.download(String path, String file, String url);
@@ -14,11 +15,13 @@ Boolean File.isFile(String path);
 Boolean File.isFolder(String path);
 void File.move(String path1, String path2);
 String File.read(String path);
+String File.readFromWeb(String url);
 void File.remove(String path);
 void File.removeFolder(String path);
 void File.unZip(String path1, String path2, Boolean makeFolder);
 void File.write(String path, String value);
 */
+
 
 const File = {
     createFolder: function(path) {
@@ -153,20 +156,26 @@ const File = {
             }
         }));
     },
-    copy: function(path1, path2) {
+    copy: function(path1, path2, useNio) {
         try {
             var file1 = new java.io.File(path1);
             var file2 = new java.io.File(path2);
-            var fis = new java.io.FileInputStream(file1);
-            var fos = new java.io.FileOutputStream(file2);
-            var bis = new java.io.BufferedInputStream(fis);
-            var bos = new java.io.BufferedOutputStream(fos);
-            var buf;
-            while((buf = bis.read()) != -1) {
-                bos.write(buf);
+            if(useNio) {
+                var fis = new java.io.FileInputStream(file1).getChannel();
+                var fos = new java.io.FileOutputStream(file2).getChannel();
+                fis.transferTo(0, fis.size(), fos);
+            } else {
+                var fis = new java.io.FileInputStream(file1);
+                var fos = new java.io.FileOutputStream(file2);
+                var bis = new java.io.BufferedInputStream(fis);
+                var bos = new java.io.BufferedOutputStream(fos);
+                var buf;
+                while((buf = bis.read()) != -1) {
+                    bos.write(buf);
+                }
+                bis.close();
+                bos.close();
             }
-            bis.close();
-            bos.close();
             fis.close();
             fos.close();
         } catch(e) {
@@ -199,7 +208,7 @@ const File = {
             print(e + ", " + e.lineNumber);
         }
     },
-    copyFolder: function(path1, path2) {
+    copyFolder: function(path1, path2, useNio) {
         try {
             var file1 = new java.io.File(path1);
             var file2 = new java.io.File(path2);
@@ -209,12 +218,58 @@ const File = {
                 var child = file1.list();
                 for(var n = 0; n < child.length; n++) {
                     var file4 = new java.io.File(file1, child[n]);
-                    if(file4.isDirectory()) File.copyFolder(file4, file3);
-                    else File.copy(file4, new java.io.File(file3, child[n]));
+                    if(file4.isDirectory()) File.copyFolder(file4, file3, useNio);
+                    else File.copy(file4, new java.io.File(file3, child[n]), useNio);
                 }
             } else {
-                File.copy(path1, path2);
+                File.copy(path1, path2, useNio);
             }
+        } catch(e) {
+            print(e + ", " + e.lineNumber);
+        }
+    },
+    copyFromWeb: function(url, path) {
+        try {
+            var url = new java.net.URL(url);
+            var con = url.openConnection();
+            if(con != null) {
+                con.setConnectTimeout(5000);
+                con.setUseCaches(false);
+                var bis = new java.io.BufferedInputStream(con.getInputStream());
+                var file = new java.io.File(path);
+                var fos = new java.io.FileOutputStream(file);
+                var bos = new java.io.BufferedOutputStream(fos);
+                var buf;
+                while((buf = bis.read()) != -1) {
+                    bos.write(buf);
+                }
+                bis.close();
+                bos.close();
+                con.disconnect();
+                fos.close();
+            } catch(e) {
+                print(e + ", " + e.lineNumber);
+            }
+        }
+    },
+    readFromWeb: function(url) {
+        try {
+            var url = new java.net.URL(url);
+            var con = url.openConnection();
+            if(con != null) {
+                con.setConnectTimeout(5000);
+                con.setUseCaches(false);
+                var isr = new java.io.InputStreamReader(con.getInputStream());
+                var br = new java.io.BufferedReader(isr);
+                var str = br.readLine();
+                var line = "";
+                while((line = br.readLine()) != null) {
+                    str += "\n" + line;
+                }
+                br.close();
+                con.disconnect();
+            }
+            return str.toString();
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -241,3 +296,5 @@ function selectLevelHook() {
         if(!so.hasProperty(scope, "File")) so.putProperty(scope, "File", File);
     }
 }
+
+
