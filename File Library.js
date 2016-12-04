@@ -22,7 +22,6 @@ void File.unZip(String path1, String path2, Boolean makeFolder);
 void File.write(String path, String value);
 */
 
-
 const File = {
     createFolder: function(path) {
         try {
@@ -247,9 +246,9 @@ const File = {
                 bos.close();
                 con.disconnect();
                 fos.close();
-            } catch(e) {
-                print(e + ", " + e.lineNumber);
             }
+        } catch(e) {
+            print(e + ", " + e.lineNumber);
         }
     },
     readFromWeb: function(url) {
@@ -296,5 +295,4 @@ function selectLevelHook() {
         if(!so.hasProperty(scope, "File")) so.putProperty(scope, "File", File);
     }
 }
-
 
