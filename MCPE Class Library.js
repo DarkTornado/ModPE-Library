@@ -1,6 +1,6 @@
 /*
 MCPE Class Library
-version 1.0
+version 2.0
 © 2016 Dark Tornado, All rights reserved.
 
 String mcpelib.info.Name
@@ -11,9 +11,13 @@ TextView mcpelib.gui.TextView(Context ctx, boolean useBlackText);
 EditText mcpelib.gui.EditText(Context ctx, boolean useNewGui, boolean notUseFullScreenKeyboard);
 Button mcpelib.gui.Button(Context ctx, boolean useNewGui, boolean useSound);
 object mcpelib.gui.Switch(Context ctx, boolean useBlackText);
+object mcpelib.gui.CheckBox(Context ctx, boolean useBlackText);
 
 object mcpelib.window.Dialog(Context ctx, boolean useNewGui, boolean useSound);
+object mcpelib.window.Window(Context ctx, boolean useNewGui);
+object mcpelib.window.FloatingWindow(Context ctx, boolean useNewGui);
 */
+
 
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
 const sdcard = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -33,7 +37,7 @@ const mcpelib = {};
 mcpelib.info = {
     Name: "MCPE Class Library",
     Developer: "Dark Tornado",
-    Version: "1.0"
+    Version: "2.0"
 };
 
 const Utils = {
@@ -230,6 +234,8 @@ const BitmapManager = {
             guis[2] = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/newgui/ButtonWithBorder.png"));
             guis[3] = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/newgui/ButtonWithBorderPressed.png"));
             guis[4] = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/gui.png"));
+            guis[5] = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/newgui/buttons/checkbox/checkbox_unchecked.png"));
+            guis[6] = new android.graphics.BitmapFactory.decodeStream(ModPE.openInputStreamFromTexturePack("images/gui/newgui/buttons/checkbox/checkbox_checked.png"));
             bitmaps[0] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[0], 8, 32, 8, 8), Utils.getDp(8), Utils.getDp(8), false);
             bitmaps[1] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[0], 0, 32, 8, 8), Utils.getDp(8), Utils.getDp(8), false);
             bitmaps[2] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[0], 0, 32, 8, 8, matrix, false), Utils.getDp(8), Utils.getDp(8), false);
@@ -243,6 +249,12 @@ const BitmapManager = {
             }
             bitmaps[7] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[4], 0, 86, 200, 20), Utils.getDp(100), Utils.getDp(10), false);
             bitmaps[8] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[4], 0, 46, 200, 20), Utils.getDp(100), Utils.getDp(10), false);
+            try {
+                bitmaps[9] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[5], 0, 0, 16, 13), Utils.getDp(32), Utils.getDp(26), false);
+                bitmaps[10] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[6], 0, 0, 16, 13), Utils.getDp(32), Utils.getDp(26), false);
+            } catch(err) {
+                Utils.showDialog("MCPE's version is too low", "You should update Minecraft PE or enable \"Minecraft Button Support 2.0.modpkg\".");
+            }
         } catch(e) {
             Utils.showError(e);
         }
@@ -261,6 +273,8 @@ const BitmapManager = {
             localBitmaps[6] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[5], 150, 57, 150, 56), Utils.getDp(150), Utils.getDp(57), false);
             localBitmaps[7] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[5], 150, 114, 150, 30), Utils.getDp(150), Utils.getDp(30), false);
             localBitmaps[8] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[5], 0, 114, 150, 30), Utils.getDp(150), Utils.getDp(30), false);
+            localBitmaps[9] = bitmaps[9];
+            localBitmaps[10] = bitmaps[10];
         } catch(e) {
             Utils.showError(e);
         }
@@ -375,14 +389,14 @@ mcpelib.gui = {
             btn.setTypeface(font);
             btn.setOnTouchListener(new android.view.View.OnTouchListener() {
                 onTouch: function(v, ev) {
-                    if(ev.action == android.view.MotionEvent.ACTION_DOWN) {
+                    if(ev.action == android.view.MotionEvent.ACTION_DOWN || ev.action == android.view.MotionEvent.ACTION_MOVE) {
                         if(useNewGui) {
                             btn.setTextColor(white);
                             btn.setBackgroundDrawable(BitmapManager.getDrawable(6));
                         } else {
                             btn.setBackgroundDrawable(BitmapManager.getDrawable(1));
                         }
-                    } else if(ev.action == android.view.MotionEvent.ACTION_UP) {
+                    } else {
                         if(useNewGui) {
                             btn.setTextColor(black);
                             btn.setBackgroundDrawable(BitmapManager.getDrawable(5));
@@ -427,6 +441,37 @@ mcpelib.gui = {
         } catch(e) {
             Utils.showError(e);
         }
+    },
+    CheckBox: function(ctx, useBlackText) {
+        try {
+            this.layout = new android.widget.LinearLayout(ctx);
+            this.layout.setOrientation(0);
+            this.check = new android.widget.ToggleButton(ctx);
+            this.check.setText("");
+            this.check.setTextOn("");
+            this.check.setTextOff("");
+            this.check.setLayoutParams(new android.widget.LinearLayout.LayoutParams(Utils.getDp(32), Utils.getDp(26)));
+            this.check.setGravity(android.view.Gravity.LEFT | android.view.Gravity.CENTER_VERTICAL);
+            this.check.setBackgroundDrawable(BitmapManager.getDrawable(9));
+            this.check.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function(v) {
+                    if(v.isChecked()) v.setBackgroundDrawable(BitmapManager.getDrawable(10));
+                    else v.setBackgroundDrawable(BitmapManager.getDrawable(9));
+                }
+            }));
+            this.txt = new mcpelib.gui.TextView(ctx);
+            if(useBlackText) this.txt.setTextColor(black);
+            else this.txt.setTextColor(white);
+            this.txt.setLayoutParams(new android.widget.LinearLayout.LayoutParams(-1, -2));
+            this.txt.setGravity(android.view.Gravity.LEFT | android.view.Gravity.CENTER_VERTICAL);
+            this.txt.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function(v) {
+                    this.check.setChecked(!this.check.isChecked());
+                }
+            }));
+        } catch(e) {
+            Utils.showError(e);
+        }
     }
 };
 
@@ -448,6 +493,15 @@ mcpelib.gui.Switch.prototype = {
     setLayoutParams: function(params) {
         this.layout.setLayoutParams(params);
     },
+    setId: function(id) {
+        this.btn.setId(id);
+    },
+    getId: function() {
+        return this.btn.getId();
+    },
+    setPadding: function(pad, pad, pad, pad) {
+        this.layout.setPadding(pad, pad, pad, pad);
+    },
     mv: function() {
         this.layout.addView(this.txt);
         this.layout.addView(this.btn);
@@ -455,10 +509,44 @@ mcpelib.gui.Switch.prototype = {
     }
 };
 
+mcpelib.gui.CheckBox.prototype = {
+    setText: function(txt) {
+        this.txt.setText(" " + txt);
+    },
+    setTextColor: function(color) {
+        this.txt.setTextColor(color);
+    },
+    setChecked: function(isChecked) {
+        if(isChecked) this.check.setBackgroundDrawable(BitmapManager.getDrawable(10));
+        else this.check.setBackgroundDrawable(BitmapManager.getDrawable(9));
+        this.check.setChecked(isChecked);
+    },
+    setOnCheckedChangeListener: function(listener) {
+        this.check.setOnCheckedChangeListener(listener);
+    },
+    setLayoutParams: function(params) {
+        this.layout.setLayoutParams(params);
+    },
+    setId: function(id) {
+        this.check.setId(id);
+    },
+    getId: function() {
+        return this.check.getId();
+    },
+    setPadding: function(pad, pad, pad, pad) {
+        this.layout.setPadding(pad, pad, pad, pad);
+    },
+    mv: function() {
+        this.layout.addView(this.check);
+        this.layout.addView(this.txt);
+        return this.layout;
+    }
+};
+
 mcpelib.window = {
     Dialog: function(ctx, useNewGui, useSound) {
         this.dialog = new android.widget.PopupWindow();
-        this.title = "";
+        this.title = null;
         this.titleColor = yellow;
         this.msg = null;
         this.pBtn = null;
@@ -466,7 +554,29 @@ mcpelib.window = {
         this.view = null;
         this.useNewGui = useNewGui;
         this.useSound = useSound;
-    }
+    },
+    Window: function(ctx, useNewGui) {
+        this.window = new android.widget.PopupWindow();
+        this.title = null;
+        this.titleColor = yellow;
+        this.view = null;
+        this.useNewGui = useNewGui;
+        this.makeScroll = false;
+    },
+    FloatingWindow: function(ctx, useNewGui) {
+        this.window = new android.widget.PopupWindow();
+        this.layout = new android.widget.LinearLayout(ctx);
+        this.layout.setOrientation(1);
+        this.layout.setGravity(android.view.Gravity.CENTER);
+        this.title = null;
+        this.view = null;
+        this.useNewGui = useNewGui;
+        this.canDrag = true;
+        var Gravity = android.view.Gravity;
+        this.gravityArray = [Gravity.LEFT | Gravity.TOP, Gravity.CENTER | Gravity.TOP, Gravity.RIGHT | Gravity.TOP, Gravity.LEFT | Gravity.CENTER, Gravity.CENTER, Gravity.RIGHT | Gravity.CENTER, Gravity.LEFT | Gravity.BOTTOM, Gravity.CENTER | Gravity.BOTTOM, Gravity.RIGHT | Gravity.BOTTOM];
+        this.gravity = 0;
+        this.pos = [0, 0];
+    },
 };
 
 mcpelib.window.Dialog.prototype = {
@@ -498,7 +608,7 @@ mcpelib.window.Dialog.prototype = {
             var cache = this;
             this.pBtn.setOnTouchListener(new android.view.View.OnTouchListener({
                 onTouch: function(v, ev) {
-                    if(ev.action == android.view.MotionEvent.ACTION_DOWN) {
+                    if(ev.action == android.view.MotionEvent.ACTION_DOWN || ev.action == android.view.MotionEvent.ACTION_MOVE) {
                         if(cache.useNewGui) {
                             cache.pBtn.setBackgroundDrawable(BitmapManager.getDrawable(6));
                             cache.pBtn.setTextColor(white);
@@ -538,7 +648,7 @@ mcpelib.window.Dialog.prototype = {
             var cache = this;
             this.nBtn.setOnTouchListener(new android.view.View.OnTouchListener() {
                 onTouch: function(v, ev) {
-                    if(ev.action == android.view.MotionEvent.ACTION_DOWN) {
+                    if(ev.action == android.view.MotionEvent.ACTION_DOWN || ev.action == android.view.MotionEvent.ACTION_MOVE) {
                         if(cache.useNewGui) {
                             cache.nBtn.setBackgroundDrawable(BitmapManager.getDrawable(6));
                             cache.nBtn.setTextColor(white);
@@ -573,16 +683,17 @@ mcpelib.window.Dialog.prototype = {
         try {
             var layout = new android.widget.LinearLayout(ctx);
             layout.setOrientation(1);
-            var title = new android.widget.TextView(ctx);
-            title.setText(this.title);
-            title.setTextSize(25);
-            title.setTextColor(this.titleColor);
-            title.setTypeface(font);
-            title.setGravity(android.view.Gravity.CENTER);
-            if(this.useNewGui) title.setBackgroundDrawable(BitmapManager.getDrawable(7));
-            else title.setBackgroundDrawable(BitmapManager.getDrawable(2));
-            var pad = Utils.getDp(10);
-            title.setPadding(pad, pad, pad, Utils.getDp(15));
+            if(this.title != null) {
+                var title = new mcpelib.gui.TextView(ctx);
+                title.setText(this.title);
+                title.setTextSize(25);
+                title.setTextColor(this.titleColor);
+                title.setGravity(android.view.Gravity.CENTER);
+                if(this.useNewGui) title.setBackgroundDrawable(BitmapManager.getDrawable(7));
+                else title.setBackgroundDrawable(BitmapManager.getDrawable(2));
+                var pad = Utils.getDp(10);
+                title.setPadding(pad, pad, pad, Utils.getDp(15));
+            }
             if(this.msg != null) {
                 var text = new android.widget.TextView(ctx);
                 text.setText(this.msg);
@@ -614,7 +725,7 @@ mcpelib.window.Dialog.prototype = {
             scroll.addView(layout);
             var layout2 = new android.widget.LinearLayout(ctx);
             layout2.setOrientation(1);
-            layout2.addView(title);
+            if(this.title != null) layout2.addView(title);
             layout2.addView(scroll);
             this.dialog.setContentView(layout2);
             this.dialog.setFocusable(true);
@@ -622,12 +733,239 @@ mcpelib.window.Dialog.prototype = {
             else this.dialog.setBackgroundDrawable(BitmapManager.getDrawable(0));
             this.dialog.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth() * 2 / 3);
             this.dialog.setHeight(ctx.getWindowManager().getDefaultDisplay().getHeight() * 4 / 5);
-            this.dialog.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER | android.view.Gravity.CENTER, 0, 0);
+            this.dialog.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER, 0, 0);
         } catch(e) {
             Utils.showError(e);
         }
     }
 };
+
+mcpelib.window.Window.prototype = {
+    close: function() {
+        try {
+            this.window.dismiss();
+        } catch(e) {
+            Utils.showError(e);
+        }
+    },
+    setTitle: function(str) {
+        this.title = str.toString();
+    },
+    setTitleColor: function(color) {
+        this.titleColor = color;
+    },
+    setView: function(view) {
+        this.view = view;
+    },
+    setCanScroll: function(canScroll) {
+        this.makeScroll = canScroll;
+    },
+    show: function() {
+        try {
+            var pad = Utils.getDp(15);
+            var layout = new android.widget.LinearLayout(ctx);
+            layout.setOrientation(1);
+            if(this.title != null) {
+                var title = new mcpelib.gui.TextView(ctx);
+                title.setText(this.title);
+                title.setTextSize(25);
+                title.setTextColor(this.titleColor);
+                title.setGravity(android.view.Gravity.CENTER);
+                if(this.useNewGui) title.setBackgroundDrawable(BitmapManager.getDrawable(7));
+                else title.setBackgroundDrawable(BitmapManager.getDrawable(2));
+                var pad = Utils.getDp(10);
+                title.setPadding(pad, pad, pad, Utils.getDp(16));
+                layout.addView(title);
+            }
+            if(this.view != null) {
+                var cacheLayout = new android.widget.LinearLayout(ctx);
+                cacheLayout.setOrientation(1);
+                cacheLayout.addView(this.view);
+                cacheLayout.setPadding(pad, pad, pad, pad);
+                if(this.makeScroll) {
+                    var scroll = new android.widget.ScrollView(ctx);
+                    scroll.addView(cacheLayout);
+                    layout.addView(scroll);
+                } else {
+                    layout.addView(cacheLayout);
+                }
+            }
+            this.window.setContentView(layout);
+            this.window.setFocusable(true);
+            if(this.useNewGui) this.window.setBackgroundDrawable(BitmapManager.getDrawable(5));
+            else this.window.setBackgroundDrawable(BitmapManager.getDrawable(0));
+            this.window.setWidth(ctx.getWindowManager().getDefaultDisplay().getWidth());
+            this.window.setHeight(ctx.getWindowManager().getDefaultDisplay().getHeight());
+            this.window.showAtLocation(ctx.getWindow().getDecorView(), android.view.Gravity.CENTER, 0, 0);
+        } catch(e) {
+            Utils.showError(e);
+        }
+    }
+};
+
+mcpelib.window.FloatingWindow.prototype = {
+    close: function() {
+        try {
+            this.window.dismiss();
+        } catch(e) {
+            Utils.showError(e);
+        }
+    },
+    setTitle: function(txt) {
+        this.title = txt;
+    },
+    addText: function(text, func) {
+        try {
+            var txt = new mcpelib.gui.TextView(ctx, this.useNewGui);
+            txt.setText(text);
+            txt.setTextSize(15);
+            txt.setGravity(android.view.Gravity.CENTER);
+            if(func != null) txt.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function(v) {
+                    try {
+                        if(typeof func == "function") func();
+                        else eval(func + "");
+                    } catch(e) {
+                        Utils.showError(e);
+                    }
+                }
+            }));
+            var pad = Utils.getDp(1);
+            txt.setPadding(pad, pad, pad, pad);
+            this.layout.addView(txt);
+        } catch(e) {
+            Utils.showError(e);
+        }
+    },
+    addToggleText: function(text, func1, func2, isOn) {
+        try {
+            var useNew = this.useNewGui;
+            var txt = new mcpelib.gui.TextView(ctx, useNew);
+            txt.setText(text);
+            if(isOn) txt.setTextColor(yellow);
+            txt.setTextSize(15);
+            txt.setGravity(android.view.Gravity.CENTER);
+            txt.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function(v) {
+                    try {
+                        switch(txt.getTextColors().getDefaultColor()) {
+                            case yellow:
+                                if(typeof func2 == "function") func2();
+                                else eval(func2 + "");
+                                if(useNew) txt.setTextColor(black);
+                                else txt.setTextColor(white);
+                                break;
+                            default:
+                                if(typeof func1 == "function") func1();
+                                else eval(func1 + "");
+                                txt.setTextColor(yellow);
+                                break;
+                        }
+                    } catch(e) {
+                        Utils.showError(e);
+                    }
+                }
+            }));
+            var pad = Utils.getDp(1);
+            txt.setPadding(pad, pad, pad, pad);
+            this.layout.addView(txt);
+        } catch(e) {
+            Utils.showError(e);
+        }
+    },
+    setPosition: function(gravityId, x, y) {
+        this.gravity = this.gravityArray[gravityId];
+        this.dragType = gravityId;
+        this.pos = [x, y];
+    },
+    show: function() {
+        try {
+            var window = this.window;
+            var layout = new android.widget.LinearLayout(ctx);
+            layout.setOrientation(1);
+            var title = new mcpelib.gui.TextView(ctx);
+            title.setText(this.title);
+            title.setTextColor(yellow);
+            title.setTextSize(17);
+            title.setGravity(android.view.Gravity.CENTER);
+            if(this.useNewGui) title.setBackgroundDrawable(BitmapManager.getDrawable(7));
+            else title.setBackgroundDrawable(BitmapManager.getDrawable(2));
+            var pad = Utils.getDp(4);
+            title.setPadding(pad, pad, pad, Utils.getDp(6));
+            layout.addView(title);
+            pad = Utils.getDp(2);
+            this.layout.setPadding(pad, pad, pad, pad);
+            var scroll = new android.widget.ScrollView(ctx);
+            scroll.addView(this.layout);
+            scroll.setPadding(pad, pad, pad, pad);
+            layout.addView(scroll);
+            title.setOnClickListener(new android.view.View.OnClickListener({
+                onClick: function(v) {
+                    try {
+                        if(layout.getChildCount() == 1) {
+                            layout.addView(scroll);
+                            window.update(Utils.getDp(120), Utils.getDp(150));
+                        } else {
+                            layout.removeView(scroll);
+                            window.update(Utils.getDp(120), -2);
+                        }
+                    } catch(e) {
+                        Utils.showError(e);
+                    }
+                }
+            }));
+            var longTouchCheck = false;
+            var dragType = this.dragType;
+            title.setOnLongClickListener(new android.view.View.OnLongClickListener({
+                onLongClick: function(v) {
+                    longTouchCheck = true;
+                    return true;
+                }
+            }));
+            title.setOnTouchListener(new android.view.View.OnTouchListener({
+                onTouch: function(v, ev) {
+                    try {
+                        if(longTouchCheck) {
+                            switch(ev.action) {
+                                case android.view.MotionEvent.ACTION_MOVE:
+                                    var eX = ev.getRawX();
+                                    var eY = ev.getRawY();
+                                    var sX = ctx.getWindowManager().getDefaultDisplay().getWidth();
+                                    var sY = ctx.getWindowManager().getDefaultDisplay().getHeight();
+                                    var wS = [window.getWidth(), window.getHeight()];
+                                    if(dragType == 0) window.update(eX, eY, wS[0], wS[1]);
+                                    else if(dragType == 1) window.update(eX - sX / 2, eY, wS[0], wS[1]);
+                                    else if(dragType == 2) window.update(sX - eX, eY, wS[0], wS[1]);
+                                    else if(dragType == 3) window.update(eX, eY - sY / 2, wS[0], wS[1]);
+                                    else if(dragType == 4) window.update(eX - sX / 2, eY - sY / 2, wS[0], wS[1]);
+                                    else if(dragType == 5) window.update(sX - eX, eY - sY / 2, wS[0], wS[1]);
+                                    else if(dragType == 6) window.update(eX, sY - eY, wS[0], wS[1]);
+                                    else if(dragType == 7) window.update(eX - sX / 2, sY - eY, wS[0], wS[1]);
+                                    else if(dragType == 8) window.update(sX - eX, sY - eY, wS[0], wS[1]);
+                                    break;
+                                case android.view.MotionEvent.ACTION_UP:
+                                    longTouchCheck = false;
+                                    break;
+                            }
+                        }
+                        return false;
+                    } catch(e) {
+                        Utils.showError(e);
+                    }
+                }
+            }));
+            window.setContentView(layout);
+            window.setWidth(Utils.getDp(120));
+            window.setHeight(Utils.getDp(150));
+            if(this.useNewGui) window.setBackgroundDrawable(BitmapManager.getDrawable(5));
+            else window.setBackgroundDrawable(BitmapManager.getDrawable(0));
+            window.showAtLocation(ctx.getWindow().getDecorView(), this.gravity, this.pos[0], this.pos[1]);
+        } catch(e) {
+            Utils.showError(e);
+        }
+    }
+};
+
 
 function selectLevelHook() {
     Utils.exportLibrary();
@@ -652,3 +990,4 @@ function changeLocalImageSettingHook(useLocal) {
         else Utils.showDialog("File is not Found", "You should connect to the Internet to do download additional image file and restart Blocklauncher.");
     }
 }
+
