@@ -476,6 +476,7 @@ mcpelib.gui = {
 };
 
 mcpelib.gui.Switch.prototype = {
+    constructor: mcpelib.gui.Switch,
     setText: function(txt) {
         this.txt.setText(txt);
     },
@@ -510,6 +511,7 @@ mcpelib.gui.Switch.prototype = {
 };
 
 mcpelib.gui.CheckBox.prototype = {
+    constructor: mcpelib.gui.CheckBox,
     setText: function(txt) {
         this.txt.setText(" " + txt);
     },
@@ -580,6 +582,7 @@ mcpelib.window = {
 };
 
 mcpelib.window.Dialog.prototype = {
+    constructor: mcpelib.window.Dialog,
     close: function() {
         try {
             this.dialog.dismiss();
@@ -741,6 +744,7 @@ mcpelib.window.Dialog.prototype = {
 };
 
 mcpelib.window.Window.prototype = {
+    constructor: mcpelib.window.Window,
     close: function() {
         try {
             this.window.dismiss();
@@ -804,6 +808,7 @@ mcpelib.window.Window.prototype = {
 };
 
 mcpelib.window.FloatingWindow.prototype = {
+    constructor: mcpelib.window.FloatingWindow,
     close: function() {
         try {
             this.window.dismiss();
