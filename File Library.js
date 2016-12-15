@@ -21,7 +21,6 @@ void File.removeFolder(String path);
 void File.unZip(String path1, String path2, Boolean makeFolder);
 void File.write(String path, String value);
 */
-
 const File = {
     createFolder: function(path) {
         try {
@@ -39,7 +38,7 @@ const File = {
             print(e + ", " + e.lineNumber);
         }
     },
-    write: function(name, value) {
+    write: function(path, name, value) {
         try {
             var file = new java.io.File(path);
             var fos = new java.io.FileOutputStream(file);
@@ -53,7 +52,9 @@ const File = {
     read: function(path) {
         try {
             var file = new java.io.File(path);
-            if(!file.exists()) return "";
+            if(!file.exists()) {
+                return "";
+            }
             var fis = new java.io.FileInputStream(file);
             var isr = new java.io.InputStreamReader(fis);
             var br = new java.io.BufferedReader(isr);
@@ -73,7 +74,9 @@ const File = {
     remove: function(path) {
         try {
             var file = new java.io.File(path);
-            if(file.exists()) file.delete();
+            if(file.exists()) {
+                file.delete();
+            }
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -95,11 +98,15 @@ const File = {
                 dir3 = [];
             for(var n = 0; n < dir.length; n++) {
                 var ff = new java.io.File(path + "/" + dir[n]);
-                if(ff.isDirectory()) dir2.push(dir[n]);
-                else dir3.push(dir[n]);
+                if(ff.isDirectory()) {
+                    dir2.push(dir[n]);
+                } else {
+                    dir3.push(dir[n]);
+                }
             }
-            for(var n = 0; n < dir3.length; n++)
-                dir2.push(dir3[n]);
+            for(var m = 0; m < dir3.length; m++) {
+                dir2.push(dir3[m]);
+            }
             return dir2;
         } catch(e) {
             print(e + ", " + e.lineNumber);
@@ -117,7 +124,7 @@ const File = {
     unZip: function(path1, path2, tf) {
         try {
             if(tf) {
-                var folder = new java.io.File(path);
+                var folder = new java.io.File(path2);
                 folder.mkdir();
                 var pp = path2.toString().split("/");
                 path2 = path2 + pp[pp.length - 1].substring(0, lastIndexOf("."));
@@ -129,7 +136,9 @@ const File = {
                 var fos = new java.io.FileOutputStream(path2 + "/" + entry.getName());
                 var buf = new java.nio.ByteBuffer.allocate(1024).array();
                 var len;
-                while((len = zis.read(buf)) > 0) fos.write(buf, 0, len);
+                while((len = zis.read(buf)) > 0) {
+                    fos.write(buf, 0, len);
+                }
                 zis.closeEntry();
                 fos.close();
             }
@@ -139,6 +148,7 @@ const File = {
         }
     },
     download: function(path, file, url) {
+        var ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
         ctx.runOnUiThread(new java.lang.Runnable({
             run: function() {
                 try {
@@ -159,13 +169,14 @@ const File = {
         try {
             var file1 = new java.io.File(path1);
             var file2 = new java.io.File(path2);
+            var fis, fos;
             if(useNio) {
-                var fis = new java.io.FileInputStream(file1).getChannel();
-                var fos = new java.io.FileOutputStream(file2).getChannel();
+                fis = new java.io.FileInputStream(file1).getChannel();
+                fos = new java.io.FileOutputStream(file2).getChannel();
                 fis.transferTo(0, fis.size(), fos);
             } else {
-                var fis = new java.io.FileInputStream(file1);
-                var fos = new java.io.FileOutputStream(file2);
+                fis = new java.io.FileInputStream(file1);
+                fos = new java.io.FileOutputStream(file2);
                 var bis = new java.io.BufferedInputStream(fis);
                 var bos = new java.io.BufferedOutputStream(fos);
                 var buf;
@@ -184,8 +195,11 @@ const File = {
     isFolder: function(path) {
         try {
             var file = new java.io.File(path);
-            if(file.isDirectory()) return true;
-            else return false;
+            if(file.isDirectory()) {
+                return true;
+            } else {
+                return false;
+            }
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -193,8 +207,11 @@ const File = {
     isFile: function(path) {
         try {
             var file = new java.io.File(path);
-            if(file.isFile()) return true;
-            else return false;
+            if(file.isFile()) {
+                return true;
+            } else {
+                return false;
+            }
         } catch(e) {
             print(e + ", " + e.lineNumber);
         }
@@ -210,15 +227,17 @@ const File = {
     copyFolder: function(path1, path2, useNio) {
         try {
             var file1 = new java.io.File(path1);
-            var file2 = new java.io.File(path2);
             if(file1.isDirectory()) {
                 var file3 = new java.io.File(path2, file1.getName());
                 file3.mkdirs();
                 var child = file1.list();
                 for(var n = 0; n < child.length; n++) {
                     var file4 = new java.io.File(file1, child[n]);
-                    if(file4.isDirectory()) File.copyFolder(file4, file3, useNio);
-                    else File.copy(file4, new java.io.File(file3, child[n]), useNio);
+                    if(file4.isDirectory()) {
+                        File.copyFolder(file4, file3, useNio);
+                    } else {
+                        File.copy(file4, new java.io.File(file3, child[n]), useNio);
+                    }
                 }
             } else {
                 File.copy(path1, path2, useNio);
@@ -229,7 +248,7 @@ const File = {
     },
     copyFromWeb: function(url, path) {
         try {
-            var url = new java.net.URL(url);
+            url = new java.net.URL(url);
             var con = url.openConnection();
             if(con != null) {
                 con.setConnectTimeout(5000);
@@ -253,14 +272,15 @@ const File = {
     },
     readFromWeb: function(url) {
         try {
-            var url = new java.net.URL(url);
+            var str = "";
+            url = new java.net.URL(url);
             var con = url.openConnection();
             if(con != null) {
                 con.setConnectTimeout(5000);
                 con.setUseCaches(false);
                 var isr = new java.io.InputStreamReader(con.getInputStream());
                 var br = new java.io.BufferedReader(isr);
-                var str = br.readLine();
+                str = br.readLine();
                 var line = "";
                 while((line = br.readLine()) != null) {
                     str += "\n" + line;
@@ -292,7 +312,8 @@ function selectLevelHook() {
     var so = org.mozilla.javascript.ScriptableObject;
     for(var n = 0; n < script.size(); n++) {
         var scope = script.get(n).scope;
-        if(!so.hasProperty(scope, "File")) so.putProperty(scope, "File", File);
+        if(!so.hasProperty(scope, "File")) {
+            so.putProperty(scope, "File", File);
+        }
     }
 }
-
