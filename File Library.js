@@ -1,7 +1,7 @@
 /*
 File Library
-© 2016 Dark Tornado, All rights reserved.
-version 2.0
+version 2.1
+© 2016-2017 Dark Tornado, All rights reserved.
 
 void File.copy(String path1, String path2, boolean useNioPackage);
 void File.copyFolder(String path1, String path2, boolean useNioPackage);
@@ -294,5 +294,6 @@ function selectLevelHook() {
         var scope = script.get(n).scope;
         if(!so.hasProperty(scope, "File")) so.putProperty(scope, "File", File);
     }
+    net.zhuoweizhang.mcpelauncher.ScriptManager.callScriptMethod("onLibraryLoaded", ["File Library", "2.1", "Dark Tornado"]);
 }
 
