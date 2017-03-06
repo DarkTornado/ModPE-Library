@@ -1,6 +1,6 @@
 /*
 FloatingWindow Library Example
-© 2016 Dark Tornado, All rights reserved.
+Copyleft 2017 Dark Tornado, All rights reserved?
 */
 
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
@@ -16,7 +16,7 @@ function newLevel() {
     try {
         win = new FloatingWindow();
         win.setTitle("인벤토리 수정");
-        win.addToggleText("블록 무한 설지", function() {
+        win.addToggleText("블록 무한 설치", function() {
             tooMany = true;
         }, function() {
             tooMany = false;
