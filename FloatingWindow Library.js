@@ -1,7 +1,7 @@
 /*
 FloatingWindow Library
-version 2.3
-© 2016 Dark Tornado, All rights reserved.
+version 2.4
+© 2016-2017 Dark Tornado, All rights reserved.
 
 new FloatingWindow();
 .setTitle(String title);
@@ -255,5 +255,6 @@ function exportLibrary() {
         var scope = script.get(n).scope;
         if(!so.hasProperty(scope, "FloatingWindow")) so.putProperty(scope, "FloatingWindow", FloatingWindow);
     }
+    ScriptManager.callScriptMethod("onLibraryLoaded", ["FloatingWindow Library", "2.4", "Dark Tornado"]);
 }
 
