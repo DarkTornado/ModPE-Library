@@ -1,6 +1,6 @@
 /*
 MCPE Class Library Example
-© 2016 Dark Tornado, All rights reserved.
+Copyleft 2017 Dark Tornado, All rights reserved?
 */
 
 const ctx = com.mojang.minecraftpe.MainActivity.currentMainActivity.get();
