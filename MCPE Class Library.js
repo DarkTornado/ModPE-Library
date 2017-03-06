@@ -1,7 +1,7 @@
 /*
 MCPE Class Library
-version 2.0
-© 2016 Dark Tornado, All rights reserved.
+version 2.1
+© 2016-2017 Dark Tornado, All rights reserved.
 
 String mcpelib.info.Name
 String mcpelib.info.Developer
@@ -37,7 +37,7 @@ const mcpelib = {};
 mcpelib.info = {
     Name: "MCPE Class Library",
     Developer: "Dark Tornado",
-    Version: "2.0"
+    Version: "2.1"
 };
 
 const Utils = {
@@ -152,6 +152,7 @@ const Utils = {
             var scope = script.get(n).scope;
             if(!so.hasProperty(scope, "mcpelib")) so.putProperty(scope, "mcpelib", mcpelib);
         }
+        net.zhuoweizhang.mcpelauncher.ScriptManager.callScriptMethod("onLibraryLoaded", ["MCPE Class Library", "2.1", "Dark Tornado"]);
     },
     showError: function(e) {
         try {
@@ -253,7 +254,7 @@ const BitmapManager = {
                 bitmaps[9] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[5], 0, 0, 16, 13), Utils.getDp(32), Utils.getDp(26), false);
                 bitmaps[10] = new android.graphics.Bitmap.createScaledBitmap(android.graphics.Bitmap.createBitmap(guis[6], 0, 0, 16, 13), Utils.getDp(32), Utils.getDp(26), false);
             } catch(err) {
-                Utils.showDialog("MCPE's version is too low", "You should update Minecraft PE or enable \"Minecraft Button Support 2.0.modpkg\".");
+                Utils.showDialog("MCPE's version is too low", "You should update Minecraft PE or enable \"Minecraft Button Support 2.1.modpkg\".");
             }
         } catch(e) {
             Utils.showError(e);
@@ -464,11 +465,6 @@ mcpelib.gui = {
             else this.txt.setTextColor(white);
             this.txt.setLayoutParams(new android.widget.LinearLayout.LayoutParams(-1, -2));
             this.txt.setGravity(android.view.Gravity.LEFT | android.view.Gravity.CENTER_VERTICAL);
-            this.txt.setOnClickListener(new android.view.View.OnClickListener({
-                onClick: function(v) {
-                    this.check.setChecked(!this.check.isChecked());
-                }
-            }));
         } catch(e) {
             Utils.showError(e);
         }
