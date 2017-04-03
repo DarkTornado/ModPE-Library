@@ -83,7 +83,7 @@ support.widget.Switch.prototype = {
         this.txt.setTextColor(color);
     },
     setTextSize: function(size) {
-        this.txt.setTextColor(size);
+        this.txt.setTextSize(size);
     },
     setChecked: function(isChecked) {
         if(isChecked) this.btn.setBackgroundDrawable(BitmapManager.getDrawable(1));
