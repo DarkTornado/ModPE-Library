@@ -499,6 +499,7 @@ mcpelib.gui = {
                         if (useNewGui) v.setBackgroundDrawable(BitmapManager.getDrawable(5));
                         else v.setBackgroundDrawable(BitmapManager.getDrawable(0));
                     }
+                    if (useSound) Util.playSound();
                 }
             }));
         } catch (e) {
